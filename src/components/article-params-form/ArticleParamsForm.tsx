@@ -20,50 +20,33 @@ import {
 } from 'src/constants/articleProps';
 
 type TArticleParamsFormProps = {
-	state: ArticleStateType;
-	setState: (params: React.SetStateAction<ArticleStateType>) => void;
+	articleState: ArticleStateType;
+	setArticleState: (params: React.SetStateAction<ArticleStateType>) => void;
 };
 
 export const ArticleParamsForm: React.FC<TArticleParamsFormProps> = ({
-	state,
-	setState,
+	articleState,
+	setArticleState,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedFontFamily, setSelectedFontFamily] = useState<OptionType>(
-		state.fontFamilyOption
-	);
-	const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(
-		state.fontSizeOption
-	);
-	const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(
-		state.fontColor
-	);
-	const [selectedBackgroundColor, setSelectedBackgroundColor] =
-		useState<OptionType>(state.backgroundColor);
-	const [selectedContentWidth, setSelectedContentWidth] = useState<OptionType>(
-		state.contentWidth
-	);
+	const [localState, setLocalState] = useState<ArticleStateType>(articleState);
+
+	const handleOnChange = (field: keyof ArticleStateType) => {
+		return (value: OptionType) => {
+			setLocalState((prevState) => ({ ...prevState, [field]: value }));
+		};
+	};
+
 	const formElementRef = useRef<HTMLDivElement | null>(null);
 
 	const handleSubmitForm = (evt: FormEvent<HTMLFormElement>) => {
 		evt.preventDefault();
-		setState({
-			...state,
-			fontFamilyOption: selectedFontFamily,
-			fontSizeOption: selectedFontSize,
-			fontColor: selectedFontColor,
-			backgroundColor: selectedBackgroundColor,
-			contentWidth: selectedContentWidth,
-		});
+		setArticleState(localState);
 	};
 
 	const handleClearForm = () => {
-		setState(defaultArticleState);
-		setSelectedFontFamily(defaultArticleState.fontFamilyOption);
-		setSelectedFontSize(defaultArticleState.fontSizeOption);
-		setSelectedFontColor(defaultArticleState.fontColor);
-		setSelectedBackgroundColor(defaultArticleState.backgroundColor);
-		setSelectedContentWidth(defaultArticleState.contentWidth);
+		setLocalState(defaultArticleState);
+		setArticleState(defaultArticleState);
 	};
 
 	const toggleIsOpen = (evt: SyntheticEvent) => {
@@ -96,34 +79,34 @@ export const ArticleParamsForm: React.FC<TArticleParamsFormProps> = ({
 					</Text>
 					<Select
 						options={fontFamilyOptions}
-						selected={selectedFontFamily}
-						onChange={setSelectedFontFamily}
+						selected={localState.fontFamilyOption}
+						onChange={handleOnChange('fontFamilyOption')}
 						title='Шрифт'
 					/>
 					<RadioGroup
 						name='font-size'
 						options={fontSizeOptions}
-						selected={selectedFontSize}
-						onChange={setSelectedFontSize}
+						selected={localState.fontSizeOption}
+						onChange={handleOnChange('fontSizeOption')}
 						title='Размер Шрифта'
 					/>
 					<Select
 						options={fontColors}
-						selected={selectedFontColor}
-						onChange={setSelectedFontColor}
+						selected={localState.fontColor}
+						onChange={handleOnChange('fontColor')}
 						title='Цвет Шрифта'
 					/>
 					<Separator />
 					<Select
 						options={backgroundColors}
-						selected={selectedBackgroundColor}
-						onChange={setSelectedBackgroundColor}
+						selected={localState.backgroundColor}
+						onChange={handleOnChange('backgroundColor')}
 						title='Цвет фона'
 					/>
 					<Select
 						options={contentWidthArr}
-						selected={selectedContentWidth}
-						onChange={setSelectedContentWidth}
+						selected={localState.contentWidth}
+						onChange={handleOnChange('contentWidth')}
 						title='Ширина контента'
 					/>
 					<div className={styles.bottomContainer}>
